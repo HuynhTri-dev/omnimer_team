@@ -1,0 +1,21 @@
+BR_ID,Business_Requirement,FR_ID,Functional_Requirement,US_ID,User_Story,TestCase_ID,Test_Case_Description,Status
+OB-Core,Multi-Domain Workflow Adaptability,FR-PROJ-001,Multi-View Board Engine,US-001,Dynamic Workflow & Custom Columns,TC-PROJ-001,Verify view switching between Kanban and Table renders in < 1s,Planned
+OB-Core,Multi-Domain Workflow Adaptability,FR-PROJ-002,Dynamic Workflow Customization,US-001,Dynamic Workflow & Custom Columns,TC-PROJ-002,Verify custom column creation and WIP limit boundary warnings,Planned
+OB-Core,Multi-Domain Workflow Adaptability,FR-PROJ-003,Dynamic Custom Fields,US-001,Dynamic Workflow & Custom Columns,TC-PROJ-003,Verify custom field type validation (number budget and dropdown),Planned
+OB-Scheduling,Critical Path & Dependency Governance,FR-PROJ-004,Interactive Gantt Scheduling,US-002,Interactive Gantt Dependency,TC-PROJ-004,Verify Finish-to-Start dependency shifts downstream dates automatically,Planned
+OB-Scheduling,Critical Path & Dependency Governance,FR-PROJ-005,Critical Path Identification,US-002,Interactive Gantt Dependency,TC-PROJ-005,Verify critical path highlights and circular dependency error detection,Planned
+OB-Scheduling,Critical Path & Dependency Governance,FR-PROJ-006,Scrum Sprint Management,US-002,Interactive Gantt Dependency,TC-PROJ-006,Verify Sprint container creation and burndown velocity calculations,Planned
+OB-02,Zero Dropped Customer Communications,FR-CHAN-001,Telegram Ingestion Gateway,US-003,Unified Messaging & 1-Click Task,TC-CHAN-001,Verify incoming Telegram message ingestion latency < 2s,Planned
+OB-02,Zero Dropped Customer Communications,FR-CHAN-002,Zalo OA Ingestion Gateway,US-003,Unified Messaging & 1-Click Task,TC-CHAN-002,Verify Zalo OA webhook payload queues into message broker,Planned
+OB-02,Zero Dropped Customer Communications,FR-CHAN-003,Unified Inbox UI & Reply,US-003,Unified Messaging & 1-Click Task,TC-CHAN-003,Verify outbound reply dispatches back to original chat channel,Planned
+OB-02,Zero Dropped Customer Communications,FR-CHAN-004,1-Click Message-to-Task,US-003,Unified Messaging & 1-Click Task,TC-CHAN-004,Verify 1-click conversion creates task with deep link to chat,Planned
+OB-01,Task Capture Velocity < 30s,FR-AI-001,Text-to-Task NLP Extraction,US-004,Natural Language Text-to-Task,TC-AI-001,Verify NLP extraction parses Title Assignee Deadline and Checklist,Planned
+OB-01,Task Capture Velocity < 30s,FR-AI-002,Task Confirmation Modal,US-004,Natural Language Text-to-Task,TC-AI-002,Verify human-in-the-loop modal allows editing before board commit,Planned
+OB-01,Task Capture Velocity < 30s,FR-AI-003,Voice-to-Task Transcription,US-004,Natural Language Text-to-Task,TC-AI-003,Verify voice note audio transcription feeds into task generator,Planned
+OB-03,Administrative Overhead Reduction >= 50%,FR-AI-004,Proactive Risk Monitor,US-005,Proactive Standup & Blocker Alerts,TC-AI-004,Verify hourly cron sends warning for task with < 30% progress at 36h,Planned
+OB-03,Administrative Overhead Reduction >= 50%,FR-AI-005,Daily Standup Auto-Summary,US-005,Proactive Standup & Blocker Alerts,TC-AI-005,Verify 18:00 cron aggregates daily board transitions into chat summary,Planned
+OB-04,100% Objective Performance Telemetry,FR-KPI-001,Automated Score Computation,US-006,Automated Empirical KPI Scoring,TC-KPI-001,Verify weighted score formula matches mathematical expectations,Planned
+OB-04,100% Objective Performance Telemetry,FR-KPI-002,Real-Time Personal Scorecard,US-006,Automated Empirical KPI Scoring,TC-KPI-002,Verify personal scorecard renders real-time achievement category breakdown,Planned
+OB-04,100% Objective Performance Telemetry,FR-KPI-003,Manager Review & Adjustment,US-006,Automated Empirical KPI Scoring,TC-KPI-003,Verify manager override generates immutable audit log record,Planned
+OB-05,HRM Synchronization Latency < 5m,FR-KPI-004,Inbound HRM Employee Sync,US-007,Bidirectional HRM API Sync,TC-HRM-001,Verify HRM employee.created webhook provisions new OmniMer user,Planned
+OB-05,HRM Synchronization Latency < 5m,FR-KPI-005,Outbound HRM Score Export,US-007,Bidirectional HRM API Sync,TC-HRM-002,Verify end-of-cycle export transmits encrypted payroll batch to HRM,Planned
