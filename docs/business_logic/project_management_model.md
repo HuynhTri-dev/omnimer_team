@@ -3,6 +3,9 @@
 > [!NOTE]
 > This reference guide provides a structured overview of industry-standard frameworks for project management, organizational performance, and personal productivity.
 
+> [!IMPORTANT]
+> Đây là **reference catalog**, không phải quy trình vận hành bắt buộc. Khi triển khai OmniMer, sử dụng `project_management_operating_model.md` cho lifecycle/workflow, `project_governance_raci.md` cho quyền quyết định và `project_metric_dictionary.md` cho công thức chỉ số có hiệu lực.
+
 ---
 
 ## Table of Contents

@@ -3,6 +3,9 @@
 > [!NOTE]
 > This framework provides an end-to-end measurement architecture for modern engineering and operations organizations. It is bifurcated into two synchronized engines: **Project Health & Delivery Metrics** (evaluating system/initiative performance) and **Personnel Performance KPIs** (evaluating individual and team contributions), designed for automated scoring in the **OmniKPI** and **HRM** ecosystems.
 
+> [!WARNING]
+> Đây là tài liệu tham khảo khái niệm. Công thức, cohort, chiều tốt/xấu, trọng số và quyền sử dụng trong production phải lấy từ metric contract đã phê duyệt trong `project_metric_dictionary.md`. Điểm tự động không được chuyển thẳng sang lương thưởng trước review, calibration, approval và cơ chế dispute.
+
 ---
 
 ## Executive Architecture: Dual-Layer Performance Engine
