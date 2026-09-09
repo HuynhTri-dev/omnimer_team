@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniMer - Enterprise PMIS Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Premium Dark Theme Colors */
+            --bg-base: #0f111a;
+            --bg-surface: #1a1d2d;
+            --bg-surface-hover: #232738;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #8b5cf6; /* Violet */
+            
+            /* RAG Colors */
+            --rag-green: #10b981;
+            --rag-green-bg: rgba(16, 185, 129, 0.15);
+            --rag-amber: #f59e0b;
+            --rag-amber-bg: rgba(245, 158, 11, 0.15);
+            --rag-red: #ef4444;
+            --rag-red-bg: rgba(239, 68, 68, 0.15);
+            
+            /* UI Elements */
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-radius-lg: 16px;
+            --border-radius-md: 12px;
+            --border-radius-sm: 8px;
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 0 24px 32px;
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        
+        .brand i {
+            -webkit-text-fill-color: var(--accent-primary);
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-surface-hover);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+            color: var(--accent-primary);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .header {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: rgba(15, 17, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .page-title h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .page-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-glow);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-container {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        /* Cards / Widgets */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* KPI KPI-Cards */
+        .kpi-row {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .kpi-trend {
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .trend-up { color: var(--rag-green); }
+        .trend-down { color: var(--rag-red); }
+
+        /* Widgets */
+        .widget-risk { grid-column: span 8; }
+        .widget-resource { grid-column: span 4; }
+        .widget-projects { grid-column: span 12; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 13px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr {
+            transition: background 0.2s;
+        }
+        
+        tbody tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        /* RAG Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .badge.green { background: var(--rag-green-bg); color: var(--rag-green); }
+        .badge.green::before { background: var(--rag-green); box-shadow: 0 0 8px var(--rag-green); }
+        
+        .badge.amber { background: var(--rag-amber-bg); color: var(--rag-amber); }
+        .badge.amber::before { background: var(--rag-amber); box-shadow: 0 0 8px var(--rag-amber); }
+        
+        .badge.red { background: var(--rag-red-bg); color: var(--rag-red); }
+        .badge.red::before { background: var(--rag-red); box-shadow: 0 0 8px var(--rag-red); }
+
+        /* Progress Bars */
+        .progress-container {
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Glassmorphism elements */
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: var(--border-radius-md);
+            padding: 16px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-layer-group"></i> OmniMer
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active"><i class="fa-solid fa-chart-pie"></i> Executive Portfolio</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-diagram-project"></i> Project Tracking</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-users-gear"></i> Resource Capacity</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Risk & Issue Log</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-code-compare"></i> Change Control (CCB)</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-money-check-dollar"></i> Financial EVM</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-file-contract"></i> Traceability (RTM)</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="page-title">
+                <h1>Portfolio Steering Dashboard</h1>
+                <p>Enterprise PMIS • Real-time Executive View</p>
+            </div>
+            <div class="header-actions">
+                <span class="badge green">System Healthy</span>
+                <button class="btn-primary">
+                    <i class="fa-solid fa-plus"></i> New Initiative
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-container">
+            
+            <!-- KPI Row -->
+            <div class="kpi-row">
+                <div class="card">
+                    <div class="card-title">Active Projects</div>
+                    <div class="kpi-value">24</div>
+                    <div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +2 this quarter</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Portfolio SPI (Schedule)</div>
+                    <div class="kpi-value" style="color: var(--rag-green)">0.98</div>
+                    <div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +0.02 vs last month</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Portfolio CPI (Cost)</div>
+                    <div class="kpi-value" style="color: var(--rag-amber)">0.92</div>
+                    <div class="kpi-trend trend-down"><i class="fa-solid fa-arrow-trend-down"></i> -0.04 vs last month</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Critical Risks (E3/E4)</div>
+                    <div class="kpi-value" style="color: var(--rag-red)">3</div>
+                    <div class="kpi-trend trend-down"><i class="fa-solid fa-triangle-exclamation"></i> Immediate action req.</div>
+                </div>
+            </div>
+
+            <!-- Risk RAG Heatmap (Widget 8-project_risk) -->
+            <div class="card widget-risk">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-fire-flame-curved"></i> Enterprise Risk Heatmap</div>
+                    <a href="#" style="color: var(--accent-primary); font-size: 13px; text-decoration: none;">View Risk Register →</a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Program / Project</th>
+                            <th>Composite Risk Score</th>
+                            <th>Status (RAG)</th>
+                            <th>Top Risk Driver</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OmniProject Core</strong></td>
+                            <td><span style="font-size: 18px; font-weight: 700;">22</span> <span style="color:var(--text-secondary); font-size:12px">/100</span></td>
+                            <td><span class="badge green">Green</span></td>
+                            <td style="color: var(--text-secondary)">Tech debt accumulation</td>
+                            <td>TL-Alpha</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OmniKPI Engine</strong></td>
+                            <td><span style="font-size: 18px; font-weight: 700;">48</span> <span style="color:var(--text-secondary); font-size:12px">/100</span></td>
+                            <td><span class="badge amber">Amber</span></td>
+                            <td style="color: var(--text-secondary)">Data pipeline latency</td>
+                            <td>TL-Beta</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mobile App v2</strong></td>
+                            <td><span style="font-size: 18px; font-weight: 700;">71</span> <span style="color:var(--text-secondary); font-size:12px">/100</span></td>
+                            <td><span class="badge red">Red</span></td>
+                            <td style="color: var(--text-secondary)">Key developer resignation</td>
+                            <td>PM-Charlie</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Resource Capacity (Widget 9-project_resource) -->
+            <div class="card widget-resource">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-battery-half"></i> Capacity Conflicts</div>
+                </div>
+                
+                <div class="glass-panel" style="border-left: 3px solid var(--rag-red)">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong>Nguyen Van A</strong>
+                        <span class="badge red">110% Over</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary)">
+                        Conflict: Core (80%) + App v2 (30%)
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 100%; background: var(--rag-red)"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="border-left: 3px solid var(--rag-amber)">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong>Tran Thi B</strong>
+                        <span class="badge amber">100% Full</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary)">
+                        Core (60%) + API (40%)
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 100%; background: var(--rag-amber)"></div>
+                    </div>
+                </div>
+                
+                <div class="glass-panel" style="border-left: 3px solid var(--rag-green)">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong>Le Van C (QA)</strong>
+                        <span class="badge green">90% Healthy</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary)">
+                        App v2 (90%)
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 90%; background: var(--rag-green)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Handover & CCB Gates (Widget 10 & 12) -->
+            <div class="card widget-projects">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-torii-gate"></i> Active Gate Reviews & Traceability</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Initiative</th>
+                            <th>Current Gate</th>
+                            <th>Pending CCB CRs</th>
+                            <th>Handover Documentation Health</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Payment Gateway Migration</td>
+                            <td><span style="color:var(--accent-secondary); font-weight:600">G3 (Execution)</span></td>
+                            <td>1 Minor</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="flex:1" class="progress-container">
+                                        <div class="progress-bar" style="width: 100%; background: var(--rag-green)"></div>
+                                    </div>
+                                    <span style="font-size: 12px; width: 40px">18/18</span>
+                                </div>
+                            </td>
+                            <td><button style="background:transparent; border:1px solid var(--border-color); color:var(--text-primary); padding: 4px 12px; border-radius: 4px; cursor: pointer;">View RTM</button></td>
+                        </tr>
+                        <tr>
+                            <td>Legacy API Deprecation</td>
+                            <td><span style="color:var(--accent-secondary); font-weight:600">G4 (Handover)</span></td>
+                            <td>0</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="flex:1" class="progress-container">
+                                        <div class="progress-bar" style="width: 75%; background: var(--rag-amber)"></div>
+                                    </div>
+                                    <span style="font-size: 12px; width: 40px">14/18</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--rag-red); margin-top: 4px;">Blocked: Missing API Docs</div>
+                            </td>
+                            <td><button style="background:transparent; border:1px solid var(--border-color); color:var(--text-primary); padding: 4px 12px; border-radius: 4px; cursor: pointer;">View Checklist</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

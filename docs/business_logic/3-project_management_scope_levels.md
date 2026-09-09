@@ -4,7 +4,7 @@
 > In modern organizational management (aligned with international standards such as PMI/PMBOK, PRINCE2, and Agile/Scaled Agile Frameworks), project management responsibilities are partitioned across distinct operational and strategic tiers—from micro-level daily task coordination to macro-level enterprise portfolio governance.
 
 > [!IMPORTANT]
-> Các level mô tả **phạm vi quản lý**, không tự động quyết định chức danh hoặc quyền hệ thống. Sponsor có thể governance một project cụ thể; Scrum Master không mặc định có quyền đánh giá nhân sự. Xem `project_governance_raci.md` để xác định RACI/quyền và `project_management_operating_model.md` để xác định lifecycle.
+> These levels describe the **management scope**, and do not automatically determine job titles or system permissions. A Sponsor may govern a specific project; a Scrum Master does not by default have personnel evaluation rights. Refer to `project_governance_raci.md` to define RACI/permissions and `project_management_operating_model.md` to define the lifecycle.
 
 ---
 
