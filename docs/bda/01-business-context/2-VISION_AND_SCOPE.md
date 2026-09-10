@@ -66,3 +66,4 @@ To maintain focus on project management and governance, OmniMer will **NOT** inc
 - **Release 1 (Foundation):** Traceability Engine, Core Task Management, and Mandatory Handover Gates. (Ensures the team understands the intent and stops vibe coding).
 - **Release 2 (Governance):** Visual Leadership Dashboards (RAG Heatmaps) and Resource Capacity Management. (Ensures leadership knows where the team is going).
 - **Release 3 (Control):** Financial EVM, CCB Workflow, and Advanced KPI Metric Contracts. (Ensures strict anti-gaming and cost control).
+- **Release 4 (Enterprise Security & Admin):** Multi-Tenancy, Advanced RBAC, Audit Logging, and SSO. (Elevates the system to Enterprise-grade compliance and data isolation).

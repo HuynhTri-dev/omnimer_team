@@ -19,7 +19,7 @@ Bắt đầu đọc ở đây nếu bạn mới tham gia dự án.
 
 ---
 
-### [02. Phase 1: OmniProject & OmniChannel](./02-phase1-omniproject/PHASE1_OMNIPROJECT_MERGED.md)
+### [02. Phase 1: OmniProject & OmniChannel](./02-phase1-omniproject/README.md)
 *Giai đoạn nền tảng: Thực thi dự án và hợp nhất giao tiếp.*
 - Quản lý Board linh hoạt (Kanban, Scrum, Gantt).
 - Dependency & Critical Path.
@@ -45,6 +45,15 @@ Bắt đầu đọc ở đây nếu bạn mới tham gia dự án.
 - Cổng bàn giao bắt buộc (Mandatory Handover Gates).
 - Hội đồng Kiểm soát Thay đổi (Change Control Board - CCB).
 - **Tài liệu gộp**: Chứa FRD, AC, và Sơ đồ Trình tự.
+
+---
+
+### 05. Phase 4: Enterprise Security & Admin (Quy hoạch)
+*Giai đoạn nền tảng doanh nghiệp (Đang trong lộ trình).*
+- Phân tách dữ liệu đa không gian (Multi-Tenancy).
+- Phân quyền nâng cao (Advanced RBAC / ABAC).
+- Nhật ký truy vết bảo mật (Comprehensive Audit Log).
+- Đăng nhập một lần (SSO) và Quản trị dữ liệu (Data Archiving).
 
 ---
 
