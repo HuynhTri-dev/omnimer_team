@@ -43,7 +43,40 @@
 
 ---
 
-## 4. Pre/Post-Conditions & Kịch bản Kiểm thử
+## 4. Sequence Diagram: Task Management (CUD)
+
+Biểu đồ dưới đây mô tả luồng xử lý hệ thống khi người dùng thực hiện các thao tác Create, Update hoặc Delete (CUD) Task, áp dụng chung cho tất cả các góc nhìn (Kanban, Gantt, Table, Scrum) nhằm đảm bảo Single Source of Truth và Real-time Sync.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Client as Web Client (Bất kỳ View nào)
+    participant API as API Server
+    participant DB as Database
+    participant WS as WebSocket Server
+
+    User->>Client: Thực hiện Create / Update / Delete Task (VD: Kéo thả)
+    Client->>Client: Optimistic Update: Cập nhật UI ngay lập tức
+    Client->>API: Gửi request CUD qua REST API
+    
+    alt Xử lý thành công
+        API->>DB: Thực thi truy vấn cập nhật Database (Single Source of Truth)
+        DB-->>API: Trả về kết quả thành công
+        API-->>Client: HTTP 2xx (Xác nhận thành công)
+        API->>WS: Gửi tín hiệu báo thay đổi dữ liệu Task
+        WS-->>Client: Broadcast event tới tất cả các client đang mở dự án
+        Note over Client: Các client khác lập tức cập nhật lại UI (Sync)
+    else Xử lý thất bại (Lỗi API/DB)
+        API-->>Client: HTTP 4xx/5xx (Báo lỗi)
+        Client->>Client: Rollback UI về trạng thái trước đó
+        Client-->>User: Hiển thị thông báo lỗi (Toast/Alert)
+    end
+```
+
+---
+
+## 5. Pre/Post-Conditions & Kịch bản Kiểm thử
 
 ### FR-PRJ-001.1: Chuyển đổi View & Đồng bộ
 - **Pre-condition:** Người dùng đang ở màn hình Kanban của dự án "Marketing Q4", có quyền xem dự án.
@@ -72,7 +105,7 @@ And tôi không cần phải ấn F5 (Reload) trang web
 
 ---
 
-## 5. Non-Functional Requirements (NFRs)
+## 6. Non-Functional Requirements (NFRs)
 
 Mục này quy định các tiêu chuẩn kỹ thuật phi chức năng bắt buộc đối với Multi-View Engine.
 

@@ -22,6 +22,25 @@ Hệ thống sử dụng mô hình **RBAC (Role-Based Access Control)** áp dụ
 * **Gantt & Kanban:** Đối với Guest hoặc Member không có quyền sửa ngày, thư viện UI (ví dụ `dhtmlxGantt` hoặc `react-beautiful-dnd`) phải kích hoạt cờ `readonly: true`. 
 * **Fallback UI:** Các handle kéo thả (drag handles) bị ẩn. Nếu User cố tình dùng devtools để vượt qua frontend, API sẽ bắt chặn lỗi `HTTP 403 Forbidden`.
 
+### 1.3 Xác thực & Đăng nhập (Authentication)
+
+Hệ thống hỗ trợ hai luồng xác thực để đáp ứng cả người dùng cá nhân và enterprise:
+
+| Phương thức | Áp dụng cho | Mô tả |
+| :--- | :--- | :--- |
+| **Email / Password (JWT)** | Tất cả người dùng | Đăng nhập thông thường, access token (15 phút) + refresh token (30 ngày) lưu ở HttpOnly Cookie. |
+| **SSO — SAML 2.0** | Enterprise (trả phí) | Tích hợp với Identity Provider (IdP) doanh nghiệp: Azure AD, Okta, Google Workspace. Người dùng đăng nhập 1 lần (Single Sign-On), không cần tài khoản riêng. |
+| **SSO — OIDC (OAuth 2.0)** | Enterprise + Cá nhân | Đăng nhập qua Google, GitHub, Microsoft. Hỗ trợ Authorization Code Flow với PKCE. |
+
+**Luồng SSO SAML 2.0 (tóm tắt):**
+1. Admin Workspace cấu hình IdP (nhập Entity ID, ACS URL, Certificate).
+2. Nhân viên truy cập OmniProject → Redirect đến IdP doanh nghiệp để xác thực.
+3. IdP trả về SAML Assertion → Backend xác minh chữ ký, lấy `email` → Tạo hoặc cập nhật User trong DB → Phát JWT Session.
+
+**Business Rules:**
+* **BR-PRJ-000-SSO.1:** Nếu Workspace đã bật "SSO Enforced", đăng nhập bằng email/password bị vô hiệu hóa cho tất cả thành viên (trừ Workspace Admin dùng để quản lý khẩn cấp).
+* **BR-PRJ-000-SSO.2:** User đăng nhập SSO lần đầu tự động được gán Role `Team Member`. Admin phải nâng cấp role thủ công hoặc cấu hình role mapping từ IdP group.
+
 ---
 
 ## 2. Đặc tả API & WebSocket Protocol
@@ -82,3 +101,12 @@ Nếu Client nhận được sự kiện WebSocket có `sequence_id` nhỏ hơn 
   * Thời gian Render lần đầu (First Contentful Paint - FCP) khi chuyển đổi giữa Kanban và Gantt phải $\le 1.0s$ cho dự án chứa $<1,000$ tasks.
   * Độ trễ WebSocket (End-to-end Latency) đảm bảo $< 200ms$ trong điều kiện mạng 4G tiêu chuẩn.
 * **Browser & Device Compatibility:** Hỗ trợ chuẩn HTML5 Drag & Drop API trên Desktop và tương thích Touch Events (Long Press to Drag) trên Mobile/Tablet. Dữ liệu View phải đồng bộ xuyên suốt.
+* **Security (Bảo mật):**
+  * **Rate Limiting:** API endpoints phải áp dụng Rate Limiting. Giới hạn mặc định: `100 requests/phút/user` cho các endpoints thông thường; `10 requests/phút/IP` cho các endpoints xác thực (Login, Forgot Password) để ngăn Brute Force.
+  * **OWASP Top 10 Compliance:** Toàn bộ API phải được kiểm thử và đảm bảo không có lỗ hổng theo danh sách OWASP Top 10 (tối thiểu: Injection, XSS, IDOR, Broken Authentication, SSRF).
+  * **Input Sanitization:** Mọi input từ user phải được sanitize trước khi lưu DB. Nội dung Markdown được render ở client phải qua thư viện DOMPurify để ngăn XSS.
+  * **Secrets Management:** Tuyệt đối không hardcode API key, database credential, hay secret trong source code. Sử dụng Environment Variables và/hoặc Secret Manager (AWS Secrets Manager, HashiCorp Vault).
+* **Availability (Tính sẵn sàng):**
+  * SLA mục tiêu: **99.5% uptime** (tương đương tối đa ~3.65 giờ downtime/tháng).
+  * Triển khai với chiến lược **Zero-downtime deployment** (Rolling update hoặc Blue-Green).
+
