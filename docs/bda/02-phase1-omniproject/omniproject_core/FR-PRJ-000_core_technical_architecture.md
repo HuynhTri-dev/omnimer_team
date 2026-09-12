@@ -10,13 +10,48 @@ Hệ thống sử dụng mô hình **RBAC (Role-Based Access Control)** áp dụ
 
 ### 1.1 Ma trận Phân quyền (RBAC Matrix)
 
+Quy định quyền hạn cụ thể của từng Role trên hệ thống đối với các thao tác cốt lõi:
+
 | Hành động (Action) | Admin | Project Manager (PM) | Team Member | Guest (Client) |
 | :--- | :---: | :---: | :---: | :---: |
-| Đổi View (Kanban, Gantt...) | ✅ | ✅ | ✅ | ✅ |
-| Kéo thả Task (Đổi trạng thái) | ✅ | ✅ | ✅ | ❌ |
-| Chỉnh sửa ngày tháng trên Gantt | ✅ | ✅ | ❌ (Chỉ xem) | ❌ |
-| Nhận thông báo Real-time Radar | ✅ | ✅ | ❌ | ❌ |
-| Lùi Deadline Task | ✅ | ✅ (Chỉ Task của mình/nhân viên mình) | ❌ | ❌ |
+| **Góc nhìn & Hiển thị** | | | | |
+| Đổi View (Kanban, Gantt, Table, Calendar...) | ✅ | ✅ | ✅ | ✅ |
+| Xem Private Tasks của người khác | ✅ | ❌ | ❌ | ❌ |
+| Xem Portfolio / Cross-project | ✅ | ✅ | ❌ (Chỉ xem task mình) | ❌ |
+| **Quản lý Task (Task Management)** | | | | |
+| Tạo mới Task / Subtask | ✅ | ✅ | ✅ | ❌ |
+| Kéo thả Task (Đổi Status) | ✅ | ✅ | ✅ | ❌ |
+| Chỉnh sửa ngày tháng trên Gantt/Calendar | ✅ | ✅ | ❌ (Chỉ xem) | ❌ |
+| Lùi Deadline (Due Date) | ✅ | ✅ (Task trong project) | ❌ | ❌ |
+| Cập nhật giờ làm (Time Tracking) | ✅ | ✅ | ✅ (Chỉ task của mình) | ❌ |
+| Bỏ qua giới hạn WIP (WIP Override) | ✅ | ✅ | ❌ | ❌ |
+| Xóa Task | ✅ | ✅ | ❌ | ❌ |
+| **Quản lý Project & Quy trình** | | | | |
+| Tạo / Cập nhật Custom Workflow | ✅ | ✅ | ❌ | ❌ |
+| Thêm Custom Fields | ✅ | ✅ | ❌ | ❌ |
+| Thiết lập Sprint (Start/Complete) | ✅ | ✅ | ❌ | ❌ |
+| Phê duyệt ngày nghỉ (Leave Approval) | ✅ | ✅ | ❌ | ❌ |
+| Mời thành viên vào Project | ✅ | ✅ | ❌ | ❌ |
+| Nhận cảnh báo (Real-time Radar / Overload) | ✅ | ✅ | ❌ | ❌ |
+
+### 1.2 Ma trận RACI (Responsibility Assignment)
+
+Mô hình RACI định hình cách phối hợp giữa các vai trò trong suốt vòng đời của một công việc (Task):
+* **R (Responsible):** Người trực tiếp nhúng tay vào thực hiện công việc (Ví dụ: `assignee_id`).
+* **A (Accountable):** Người duyệt, chịu trách nhiệm cuối cùng nếu công việc hỏng/trễ (Ví dụ: `owner_id`, PM). Chỉ có 1 chữ A duy nhất cho mỗi việc.
+* **C (Consulted):** Người đóng góp ý kiến, cung cấp chuyên môn trước/trong khi làm (Ví dụ: Tech Lead, QA, gán qua `@mention`).
+* **I (Informed):** Người chỉ cần biết kết quả, không tham gia làm (Ví dụ: Client nhận thông báo tiến độ).
+
+| Giai đoạn / Tác vụ | Admin | PM / Owner | Assignee (Member) | Guest / Client |
+| :--- | :---: | :---: | :---: | :---: |
+| Khởi tạo Task, định nghĩa DoD | **I** | **A / R** | **C** | **C** (Cung cấp YC) |
+| Lên lịch, gán người làm (Assign) | **I** | **A / R** | **I** | **I** |
+| Thực thi công việc (In Progress) | **I** | **A** | **R** | **I** |
+| Báo cáo rủi ro (Đánh dấu Blocked) | **I** | **A** | **R** | **I** |
+| Chuyển giao quy trình (Handoff) | **I** | **A** | **R** | **I** |
+| Lùi/Thay đổi Deadline giữa chừng | **I** | **A / R** | **I** | **C** |
+| Nghiệm thu (Đánh giá DoD) & Đóng Task | **I** | **A / R** | **C** | **I** |
+| Cấu hình Project (Workflow, Sprints) | **A / R** | **A / R** | **I** | **I** |
 
 ### 1.2 Trải nghiệm Read-only trên Giao diện
 * **Gantt & Kanban:** Đối với Guest hoặc Member không có quyền sửa ngày, thư viện UI (ví dụ `dhtmlxGantt` hoặc `react-beautiful-dnd`) phải kích hoạt cờ `readonly: true`. 
