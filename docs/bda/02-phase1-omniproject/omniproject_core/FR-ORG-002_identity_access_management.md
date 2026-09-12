@@ -60,8 +60,9 @@
 
 ---
 
-## 4. Sequence Diagram: Luồng mời thành viên (Invite Flow)
+## 4. Sequence Diagrams
 
+### 4.1. Luồng mời thành viên (Invite Flow)
 ```mermaid
 sequenceDiagram
     autonumber
@@ -92,6 +93,48 @@ sequenceDiagram
     Client->>API: POST /auth/accept-invite
     API->>DB: Update Workspace_Member (status: ACTIVE)
     API-->>Client: HTTP 200 (Login thành công)
+```
+
+### 4.2. Luồng Cưỡng chế SSO (Force SSO) & Khóa tự động (Auto-Lock)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Nhân viên
+    participant Client as Web Client
+    participant API as API Server
+    participant DB as Database
+    participant IdP as External IdP
+
+    User->>Client: Nhập email & password (Đăng nhập truyền thống)
+    Client->>API: POST /auth/login (email, password)
+    
+    API->>DB: Kiểm tra `force_sso` của Workspace tương ứng
+    alt force_sso == true
+        DB-->>API: Yêu cầu SSO
+        API-->>Client: HTTP 403 Forbidden (Yêu cầu đăng nhập qua SSO)
+        Client->>IdP: Tự động Redirect sang trang IdP (Azure/Okta)
+    else force_sso == false
+        DB-->>API: Không bắt buộc SSO
+        API->>DB: Kiểm tra trạng thái User (is_locked?)
+        alt is_locked == true (Đang bị khóa)
+            API-->>Client: HTTP 403 (Tài khoản bị khóa tạm thời 30 phút)
+        else Tài khoản bình thường
+            API->>API: Verify Password Hash
+            alt Sai Password
+                API->>DB: Increment failed_attempts + 1
+                alt failed_attempts >= 5
+                    API->>DB: Set is_locked = true, lock_until = now + 30m
+                    API-->>Client: HTTP 403 (Nhập sai 5 lần, khóa tài khoản)
+                else Dưới 5 lần
+                    API-->>Client: HTTP 401 Unauthorized (Sai mật khẩu)
+                end
+            else Đúng Password
+                API->>DB: Reset failed_attempts = 0
+                API->>API: Sinh JWT Token
+                API-->>Client: HTTP 200 OK + JWT (Login thành công)
+            end
+        end
+    end
 ```
 
 ---

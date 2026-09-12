@@ -76,6 +76,57 @@ Hệ thống hỗ trợ hai luồng xác thực để đáp ứng cả người 
 * **BR-PRJ-000-SSO.1:** Nếu Workspace đã bật "SSO Enforced", đăng nhập bằng email/password bị vô hiệu hóa cho tất cả thành viên (trừ Workspace Admin dùng để quản lý khẩn cấp).
 * **BR-PRJ-000-SSO.2:** User đăng nhập SSO lần đầu tự động được gán Role `Team Member`. Admin phải nâng cấp role thủ công hoặc cấu hình role mapping từ IdP group.
 
+#### Sequence Diagram: Luồng Xác thực SAML 2.0
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Nhân viên
+    participant Client as Web Client
+    participant API as API Server (SP)
+    participant IdP as Identity Provider (Azure AD)
+    participant DB as Database
+
+    User->>Client: Nhập email công ty
+    Client->>API: GET /auth/saml/login?email=...
+    API->>DB: Lấy cấu hình SAML của Workspace
+    API-->>Client: SAML Request URL (Redirect)
+    Client->>IdP: Chuyển hướng tới trang Login của IdP
+    User->>IdP: Đăng nhập tại IdP (Mật khẩu / MFA)
+    IdP-->>Client: Trả về SAML Response (Assertion) POST
+    Client->>API: POST /auth/saml/acs (ACS URL)
+    API->>API: Xác minh chữ ký (X.509) & giải mã Assertion
+    API->>DB: Tìm hoặc tạo User dựa trên Email
+    API->>API: Sinh JWT (Access & Refresh Token)
+    API-->>Client: Trả về JWT (Set-Cookie HttpOnly)
+    Client-->>User: Đăng nhập thành công, vào Dashboard
+```
+
+#### Sequence Diagram: Luồng Xác thực OIDC (OAuth 2.0)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Nhân viên
+    participant Client as Web Client
+    participant API as API Server
+    participant OIDC as OIDC Provider (Google/GitHub)
+    participant DB as Database
+
+    User->>Client: Bấm "Đăng nhập với Google"
+    Client->>API: GET /auth/oidc/login
+    API-->>Client: Authorization URL (Client ID, Redirect URI, State)
+    Client->>OIDC: Chuyển hướng xin quyền (Consent screen)
+    User->>OIDC: Đồng ý cấp quyền
+    OIDC-->>Client: Redirect về callback với Authorization Code
+    Client->>API: GET /auth/oidc/callback?code=...
+    API->>OIDC: POST /token (Đổi Code lấy ID Token & Access Token)
+    OIDC-->>API: Trả về ID Token (chứa profile)
+    API->>API: Xác thực ID Token (JWT signature validation)
+    API->>DB: Tìm hoặc tạo User
+    API->>API: Sinh JWT (Access & Refresh Token) của hệ thống
+    API-->>Client: Trả về JWT (Set-Cookie HttpOnly)
+    Client-->>User: Đăng nhập thành công, vào Dashboard
+```
+
 ---
 
 ## 2. Đặc tả API & WebSocket Protocol
@@ -127,6 +178,40 @@ Hệ thống sử dụng cơ chế **Optimistic Concurrency Control (OCC) thông
 
 ### 3.3 Out-of-order Events (Gói tin đến sai thứ tự)
 Nếu Client nhận được sự kiện WebSocket có `sequence_id` nhỏ hơn `sequence_id` của bản record đang lưu tại Client, Client phải tự động bỏ qua gói tin đó (Discard) để tránh UI nhảy loạn xạ do mạng giật lag.
+
+#### Sequence Diagram: Optimistic Concurrency Control (OCC) & WebSocket Sync
+```mermaid
+sequenceDiagram
+    autonumber
+    actor UserA as User A
+    actor UserB as User B
+    participant ClientA as Client A
+    participant ClientB as Client B
+    participant API as API Server
+    participant DB as Database
+    participant WS as WebSocket Pub/Sub
+
+    Note over ClientA,ClientB: Cả hai cùng mở xem Task T1 (version: 1)
+    
+    UserA->>ClientA: Kéo Task T1 sang cột "Done"
+    ClientA->>ClientA: Optimistic Update UI ngay lập tức
+    ClientA->>API: PATCH /tasks/T1 {status: Done, version: 1}
+    API->>DB: Update Task T1 (Set status=Done, version=2)
+    DB-->>API: Success
+    API-->>ClientA: HTTP 200 OK (version: 2)
+    API->>WS: Broadcast EVENT (Task_Updated, T1, version=2)
+    WS-->>ClientB: Nhận EVENT cập nhật (T1 -> Done)
+    ClientB->>ClientB: Cập nhật UI và version=2 cho T1
+    
+    Note over UserB,ClientB: Lúc này User B cố tình lùi Deadline T1 trên UI cũ chưa kịp cập nhật (trước khi EVENT đến, do mạng lag)
+    UserB->>ClientB: Đổi Due Date T1
+    ClientB->>ClientB: Optimistic Update UI
+    ClientB->>API: PATCH /tasks/T1 {due_date: Tomorrow, version: 1}
+    API->>DB: Kiểm tra version DB (hiện tại là 2) != 1 (Client gửi)
+    DB-->>API: Conflict Error
+    API-->>ClientB: HTTP 412 Precondition Failed
+    ClientB->>ClientB: Rollback UI về trạng thái gốc, nổ Toast Error "Dữ liệu đã thay đổi, vui lòng tải lại"
+```
 
 ---
 

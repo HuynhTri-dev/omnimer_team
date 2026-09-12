@@ -17,6 +17,8 @@ Trước khi đọc các tài liệu bên dưới, hãy tham khảo [**00_domain
 ---
 
 ## 🏢 1. Level 1: Organization & Identity (Quản trị Tổ chức & Danh tính)
+> **Tài liệu tổng hợp (Phase 1):** Xem bản đặc tả phần mềm chuẩn IEEE 830 tại [**01_SRS_PHASE1_FOUNDATION.md**](./01_SRS_PHASE1_FOUNDATION.md) và Ma trận truy vết yêu cầu (CSV) tại [**02_RTM_PHASE1_FOUNDATION.csv**](./02_RTM_PHASE1_FOUNDATION.csv).
+
 
 ### * [**FR-ORG-001: Workspace, Organization Management & Billing**](./FR-ORG-001_workspace_organization_management.md) — *(5 tính năng con)*
   - **FR-ORG-001.1 - Tạo Organization & Workspace:** Khi user đăng ký mới, hệ thống tự động tạo 1 Organization và 1 Default Workspace. User trở thành Org Owner.

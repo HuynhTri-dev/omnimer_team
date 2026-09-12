@@ -51,7 +51,37 @@
 
 ---
 
-## 4. Sequence Diagram: Nâng cấp gói cước (Upgrade Subscription)
+## 4. Sequence Diagrams
+
+### 4.1. Khởi tạo Tenant (Tạo Organization & Workspace)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng mới
+    participant Client as Web Client
+    participant API as API Server
+    participant DB as Database
+    participant Cache as Redis Cache
+
+    User->>Client: Điền Form Đăng ký (Email, Password, Tên Công ty)
+    Client->>API: POST /auth/register
+    API->>DB: Kiểm tra Email tồn tại?
+    DB-->>API: Trả về Null (Chưa tồn tại)
+    
+    Note over API,DB: Bắt đầu Database Transaction
+    API->>DB: 1. Tạo User (Hash password)
+    API->>DB: 2. Tạo Organization mới (Tên công ty)
+    API->>DB: 3. Tạo Workspace mặc định (map với Org)
+    API->>DB: 4. Tạo Workspace_Member (Role: ADMIN, Status: ACTIVE)
+    Note over API,DB: Commit Transaction
+    
+    API->>Cache: Khởi tạo dữ liệu phân quyền tạm (RBAC Cache)
+    API->>API: Sinh JWT (Access & Refresh Token) chứa workspace_id mặc định
+    API-->>Client: HTTP 201 Created + Cặp JWT
+    Client-->>User: Chuyển hướng vào màn hình Onboarding / Dashboard
+```
+
+### 4.2. Nâng cấp gói cước (Upgrade Subscription)
 
 ```mermaid
 sequenceDiagram
