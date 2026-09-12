@@ -6,6 +6,11 @@ Hệ thống bao gồm **24 Phân hệ Tính năng lớn** (cùng 1 tài liệu 
 
 ---
 
+## 🗺️ Lộ trình Triển khai Lập trình (Development Phases)
+> Xem chi tiết kế hoạch phân chia 6 giai đoạn phát triển từ Nền tảng tới Nâng cao tại: [**00_DEVELOPMENT_PHASES_ROADMAP.md**](./00_DEVELOPMENT_PHASES_ROADMAP.md).
+
+---
+
 ## 📚 0. Thuật ngữ cốt lõi (Domain Terminology)
 Trước khi đọc các tài liệu bên dưới, hãy tham khảo [**00_domain_terminology.md**](./00_domain_terminology.md) để hiểu rõ định nghĩa về Organization, Workspace, Portfolio, Project, Sprint, và Task.
 
